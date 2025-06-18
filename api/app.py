@@ -7,7 +7,7 @@ from pydantic import BaseModel
 # Import OpenAI client for interacting with OpenAI's API
 from openai import OpenAI
 import os
-from typing import Optional
+from typing import Optional, List, Dict, Union
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
@@ -29,6 +29,11 @@ class ChatRequest(BaseModel):
     user_message: str      # Message from the user
     model: Optional[str] = "gpt-4.1-mini"  # Optional model selection with default
     api_key: str          # OpenAI API key for authentication
+
+class ChatMessagesRequest(BaseModel):
+    messages: List[Dict[str, str]]  # List of {role, content} dicts
+    model: Optional[str] = "gpt-4.1-mini"
+    api_key: str
 
 # Define the main chat endpoint that handles POST requests
 @app.post("/api/chat")
@@ -59,6 +64,23 @@ async def chat(request: ChatRequest):
     
     except Exception as e:
         # Handle any errors that occur during processing
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/chat-messages")
+async def chat_messages(request: ChatMessagesRequest):
+    try:
+        client = OpenAI(api_key=request.api_key)
+        async def generate():
+            stream = client.chat.completions.create(
+                model=request.model,
+                messages=request.messages,
+                stream=True
+            )
+            for chunk in stream:
+                if chunk.choices[0].delta.content is not None:
+                    yield chunk.choices[0].delta.content
+        return StreamingResponse(generate(), media_type="text/plain")
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 # Define a health check endpoint to verify API status
