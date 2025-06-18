@@ -171,16 +171,138 @@ Here's a template to get your post started!
 ```
 🚀🎉 Exciting News! 🎉🚀
 
-🏗️ Today, I'm thrilled to announce that I've successfully built and shipped my first-ever LLM using the powerful combination of , and the OpenAI API! 🖥️
+🏗️ Today, I'm thrilled to announce that I've successfully built and shipped my first-ever LLM using the powerful combination of , and the OpenAI API! 🖥️
 
 Check it out 👇
 [LINK TO APP]
 
 A big shoutout to the @AI Makerspace for all making this possible. Couldn't have done it without the incredible community there. 🤗🙏
 
-Looking forward to building with the community! 🙌✨ Here's to many more creations ahead! 🥂🎉
+Looking forward to building with the community! 🙌✨ Here's to many more creations ahead! 🥂🎉
 
 Who else is diving into the world of AI? Let's connect! 🌐💡
 
 #FirstLLMApp 
 ```
+
+## Enhanced Features & Improvements
+
+### Backend Improvements
+
+#### Multi-Turn Chat Support
+- Added `/api/chat-messages` endpoint that accepts an array of messages
+- Each message includes `role` (system/user/assistant) and `content`
+- Maintains conversation context by passing full message history to OpenAI
+- Backward compatible with original `/api/chat` endpoint
+- Supports streaming responses for real-time chat experience
+
+#### Error Handling
+- Comprehensive error handling for common API scenarios:
+  - Invalid/missing API keys
+  - Rate limiting
+  - Network errors
+  - Malformed requests
+  - Server errors
+- Detailed error messages with actionable instructions
+
+### Frontend Features
+
+#### Chat Interface
+- Modern, responsive UI with a side panel for settings
+- Real-time streaming of AI responses
+- Markdown support for rich text formatting:
+  - Bold, italic, links
+  - Code blocks
+  - Lists
+  - And other standard markdown elements
+- Chat session management:
+  - "New Chat" button to start fresh conversations
+  - Maintains full conversation history
+  - Scrolls automatically to latest messages
+
+#### User Experience
+- Message input:
+  - Enter key sends message
+  - Shift+Enter for new line
+  - Alt/Option+Enter for new line
+  - Textarea auto-expands for longer messages
+- System/Developer prompt:
+  - Optional - can be left empty
+  - Persists across messages in the same chat
+  - Can be updated at any time
+- Loading states and feedback:
+  - "AI is typing..." indicator
+  - Disabled inputs during processing
+  - Clear error messages with instructions
+
+#### Error Handling & Recovery
+- Comprehensive error messages with user-friendly instructions
+- Specific handling for common scenarios:
+  - Invalid API keys
+  - Network connectivity issues
+  - Rate limiting
+  - Server errors
+- Visual error display with clear next steps
+- Ability to retry after errors
+
+### Security & Best Practices
+- API key stored only in frontend state (not persisted)
+- CORS enabled for secure cross-origin requests
+- Input sanitization and validation
+- Proper error boundaries and fallbacks
+- No sensitive data logging
+
+### Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   # Backend
+   cd api
+   pip install -r requirements.txt
+
+   # Frontend
+   cd frontend
+   npm install
+   ```
+3. Start the development servers:
+   ```bash
+   # Backend
+   cd api
+   uvicorn app:app --reload
+
+   # Frontend
+   cd frontend
+   npm run dev
+   ```
+4. Open http://localhost:3000 in your browser
+5. Enter your OpenAI API key and start chatting!
+
+### Usage Tips
+
+1. **System Prompt**: 
+   - Optional field to set AI behavior
+   - Can be left empty for default chat behavior
+   - Examples:
+     - "You are a helpful coding assistant"
+     - "You are a creative writing tutor"
+
+2. **Chat Features**:
+   - Use Enter to send messages
+   - Use Shift+Enter or Alt+Enter for new lines
+   - Support for markdown formatting
+   - Click "New Chat" to start fresh
+
+3. **Error Recovery**:
+   - If you see an API key error, verify your key
+   - For rate limits, wait a few seconds and try again
+   - For network errors, check your connection
+
+### Deployment
+
+The application is configured for deployment on Vercel:
+- Frontend: Next.js application
+- Backend: Serverless Python functions
+- Automatic CORS and routing configuration
+
+See deployment section above for detailed instructions.
