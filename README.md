@@ -125,23 +125,3 @@ This application is optimized for deployment on [Vercel](https://vercel.com/).
    vercel
    ```
    Follow the on-screen instructions to deploy. Vercel will automatically configure the Next.js frontend and the serverless Python backend.
-
----
-
-## 🎉 Share Your Creation!
-
-You've built and deployed an advanced, LLM-powered chat application! Share your results and experience on LinkedIn.
-
-```
-🚀🎉 Exciting News! 🎉🚀
-
-I just enhanced and deployed my first full-stack LLM application using FastAPI, Next.js, and the OpenAI API! It features multi-turn chat, real-time streaming, and a slick vaporwave UI.
-
-Check it out: [LINK TO YOUR APP]
-
-A huge shoutout to the @AI Makerspace for this challenge. The community and resources have been incredible.
-
-#AI #LLM #FastAPI #NextJS #Vercel #AIMakerspace
-```
-
-</rewritten_file>
