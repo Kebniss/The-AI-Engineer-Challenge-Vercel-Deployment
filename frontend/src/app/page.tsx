@@ -17,20 +17,6 @@ export default function Home() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Helper to build the messages array for the backend
-  const buildMessagesForAPI = () => {
-    const arr = [];
-    if (systemPrompt.trim()) {
-      arr.push({ role: "system", content: systemPrompt });
-    }
-    for (const m of messages) {
-      if (m.role === "user" || m.role === "assistant") {
-        arr.push({ role: m.role, content: m.content });
-      }
-    }
-    return arr;
-  };
-
   // Handle sending a message
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +56,7 @@ export default function Home() {
         }),
       });
       if (!res.ok || !res.body) {
-        let errorMsg = `API error: ${res.status}`;
+        const errorMsg = `API error: ${res.status}`;
         let errorDetail = "";
         try {
           const data = await res.json();
@@ -121,11 +107,6 @@ export default function Home() {
         ...msgs,
         { role: "assistant", content: "" }
       ]);
-      let aiIndex = null;
-      setMessages(msgs => {
-        aiIndex = msgs.length - 1;
-        return msgs;
-      });
       while (!done) {
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
@@ -146,11 +127,11 @@ export default function Home() {
           });
         }
       }
-    } catch (err: any) {
-      if (err && err.message && err.message.toLowerCase().includes("network")) {
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'message' in err && typeof err.message === 'string' && err.message.toLowerCase().includes("network")) {
         setError("Error: Network error.\nInstruction: Please check your internet connection or your API key. If the problem persists, your API key may be invalid or your backend may be down.");
       } else {
-        setError(`Error: ${err.message || err}\nInstruction: An unexpected error occurred. Please try again or contact support.`);
+        setError(`Error: ${err instanceof Error ? err.message : String(err)}\nInstruction: An unexpected error occurred. Please try again or contact support.`);
       }
     } finally {
       setLoading(false);
