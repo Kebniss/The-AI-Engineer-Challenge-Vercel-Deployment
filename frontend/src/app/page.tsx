@@ -158,86 +158,30 @@ export default function Home() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #ffe5d0 0%, #fffbe6 60%, #c1f7e3 100%)",
-        fontFamily: "'Montserrat', 'Futura', 'Arial', sans-serif",
-        color: "#5a3a1b",
-      }}
-    >
+    <div className={styles.page}>
       {/* Sidebar for system prompt */}
-      <aside
-        style={{
-          width: 320,
-          background: "#fffbe6",
-          borderRight: "2.5px solid #ffd6a5",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "40px 18px 18px 18px",
-          gap: 24,
-          minHeight: "100vh",
-        }}
-      >
-        <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 38 }} role="img" aria-label="tropical leaf">🌿</span>
-          <span style={{ fontSize: 28, fontWeight: 700, color: "#e17055", letterSpacing: 1 }}>LLM Chat Vibe</span>
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarHeader}>
+          <span className={styles.sidebarText}>🔮</span>
+          <span className={styles.sidebarTitle}>LLM Chat</span>
         </div>
-        <div
-          style={{
-            background: "linear-gradient(135deg, #c1f7e3 0%, #fffbe6 100%)",
-            borderRadius: 18,
-            boxShadow: "0 2px 8px #ffe5d0",
-            padding: 18,
-            width: "100%",
-            marginTop: 18,
-            marginBottom: 18,
-            color: "#5a3a1b",
-            fontSize: 16,
-            minHeight: 120,
-            display: "flex",
-            flexDirection: "column",
-            gap: 8,
-          }}
-        >
-          <label style={{ fontWeight: 600, color: "#b26a32", marginBottom: 6 }}>Developer/System Prompt</label>
+        <div className={styles.promptContainer}>
+          <label className={styles.label}>Developer/System Prompt</label>
           <textarea
             value={systemPrompt}
             onChange={e => setSystemPrompt(e.target.value)}
             rows={4}
-            style={{
-              width: "100%",
-              borderRadius: 12,
-              border: "1.5px solid #ffd6a5",
-              padding: 10,
-              fontSize: 15,
-              background: "#fffbe6",
-              color: "#5a3a1b",
-              resize: "vertical",
-              boxShadow: "0 1px 4px #ffe5d0",
-            }}
+            className={styles.textarea}
             required
           />
         </div>
-        <div style={{ width: "100%", marginTop: "auto" }}>
-          <label style={{ fontWeight: 600, color: "#b26a32" }}>OpenAI API Key</label>
+        <div className={styles.apiKeyContainer}>
+          <label className={styles.label}>OpenAI API Key</label>
           <input
             type="password"
             value={apiKey}
             onChange={e => setApiKey(e.target.value)}
-            style={{
-              width: "100%",
-              marginTop: 6,
-              borderRadius: 12,
-              border: "1.5px solid #ffd6a5",
-              padding: 10,
-              fontSize: 15,
-              background: "#fffbe6",
-              color: "#5a3a1b",
-              boxShadow: "0 1px 4px #ffe5d0",
-            }}
+            className={styles.apiKeyInput}
             required
           />
         </div>
@@ -248,205 +192,46 @@ export default function Home() {
             setError("");
             setLoading(false);
           }}
-          style={{
-            width: "100%",
-            marginTop: 18,
-            background: "linear-gradient(135deg, #e17055 0%, #ffd6a5 100%)",
-            color: "#fffbe6",
-            border: "none",
-            borderRadius: 14,
-            padding: "12px 0",
-            fontWeight: 700,
-            fontSize: 17,
-            cursor: "pointer",
-            boxShadow: "0 1px 4px #ffe5d0",
-            transition: "background 0.2s, color 0.2s",
-            letterSpacing: 1,
-          }}
+          className={styles.clearButton}
         >
-          + New Chat
+          Clear Chat
         </button>
       </aside>
+
       {/* Main chat area */}
-      <main
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "flex-end",
-          minHeight: "100vh",
-          padding: "0 0 0 0",
-        }}
-      >
-        {/* Chat log */}
-        <div
-          style={{
-            width: "100%",
-            maxWidth: 700,
-            flex: 1,
-            overflowY: "auto",
-            padding: "40px 0 20px 0",
-            display: "flex",
-            flexDirection: "column",
-            gap: 18,
-          }}
-        >
-          {messages.length === 0 && !loading && (
-            <div style={{ textAlign: "center", color: "#b26a32", opacity: 0.7, fontSize: 16 }}>
-              Start the conversation!
-            </div>
-          )}
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: "flex",
-                justifyContent:
-                  msg.role === "user"
-                    ? "flex-end"
-                    : "flex-start",
-                width: "100%",
-              }}
-            >
-              <div
-                style={{
-                  background:
-                    msg.role === "user"
-                      ? "linear-gradient(135deg, #ffe5d0 0%, #ffd6a5 100%)"
-                      : "linear-gradient(135deg, #c1f7e3 0%, #fffbe6 100%)",
-                  color: "#5a3a1b",
-                  borderRadius: 18,
-                  padding: "14px 18px",
-                  maxWidth: "70%",
-                  fontSize: 16,
-                  boxShadow: "0 1px 4px #ffe5d0",
-                  marginLeft: msg.role === "user" ? 40 : 0,
-                  marginRight: msg.role === "assistant" ? 40 : 0,
-                  alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                  border:
-                    msg.role === "user"
-                      ? "2px solid #ffd6a5"
-                      : "2px solid #c1f7e3",
-                }}
-              >
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
-              </div>
+      <main className={styles.mainContent}>
+        <div className={styles.chatContainer}>
+          {messages.map((m, i) => (
+            <div key={i} className={`${styles.message} ${m.role === 'user' ? styles.user : styles.assistant}`}>
+              <ReactMarkdown>{m.content}</ReactMarkdown>
             </div>
           ))}
           {loading && (
-            <div style={{ display: "flex", justifyContent: "flex-start", width: "100%" }}>
-              <div
-                style={{
-                  background: "linear-gradient(135deg, #c1f7e3 0%, #fffbe6 100%)",
-                  color: "#5a3a1b",
-                  borderRadius: 18,
-                  padding: "14px 18px",
-                  maxWidth: "70%",
-                  fontSize: 16,
-                  boxShadow: "0 1px 4px #ffe5d0",
-                  border: "2px solid #c1f7e3",
-                  opacity: 0.7,
-                }}
-              >
-                AI is typing...
-              </div>
+            <div className={`${styles.message} ${styles.assistant}`}>
+              <ReactMarkdown>{"Thinking..."}</ReactMarkdown>
             </div>
           )}
           <div ref={chatEndRef} />
         </div>
-        {/* Error message */}
+
         {error && (
-          <div
-            style={{
-              color: "#e17055",
-              background: "#fffbe6",
-              border: "2px solid #ffd6a5",
-              borderRadius: 12,
-              padding: 12,
-              marginBottom: 10,
-              maxWidth: 500,
-              textAlign: "center",
-              fontSize: 15,
-              boxShadow: "0 1px 4px #ffe5d0",
-            }}
-          >
+          <div className={styles.error}>
             {error}
           </div>
         )}
-        {/* Input area */}
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            width: "100%",
-            maxWidth: 700,
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            padding: "0 0 40px 0",
-            background: "rgba(255,255,255,0.0)",
-          }}
-        >
-          <textarea
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <input
+            type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
-            rows={2}
-            style={{
-              flex: 1,
-              borderRadius: 14,
-              border: "1.5px solid #ffd6a5",
-              padding: 12,
-              fontSize: 16,
-              background: "#fffbe6",
-              resize: "vertical",
-              color: "#5a3a1b",
-              boxShadow: "0 1px 4px #ffe5d0",
-              minHeight: 40,
-              maxHeight: 120,
-            }}
-            placeholder="Type your message..."
-            disabled={loading}
-            required
-            onKeyDown={e => {
-              if (
-                e.key === "Enter" &&
-                !e.shiftKey &&
-                !e.altKey &&
-                !e.metaKey
-              ) {
-                e.preventDefault();
-                // Find the form and submit it
-                const form = e.currentTarget.form;
-                if (form) {
-                  form.requestSubmit();
-                }
-              }
-            }}
+            placeholder="Ask me anything..."
+            className={styles.input}
           />
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              background: loading ? "#ffd6a5" : "#e17055",
-              color: loading ? "#5a3a1b" : "#fffbe6",
-              border: "none",
-              borderRadius: 18,
-              padding: "14px 24px",
-              fontWeight: 700,
-              fontSize: 18,
-              cursor: loading ? "not-allowed" : "pointer",
-              transition: "background 0.2s, color 0.2s",
-              boxShadow: "0 2px 8px #ffe5d0",
-            }}
-          >
-            {loading ? "Sending..." : "Send"}
+          <button type="submit" disabled={loading} className={styles.button}>
+            {loading ? "..." : "Send"}
           </button>
         </form>
-        <footer style={{ marginTop: 12, color: "#b26a32", fontSize: 13, opacity: 0.7, textAlign: "center" }}>
-          <span>
-            &copy; {new Date().getFullYear()} LLM Chat Vibe &mdash; Mid-century modern cross tropical
-          </span>
-        </footer>
       </main>
     </div>
   );
