@@ -139,6 +139,14 @@ export default function Home() {
     }
   };
 
+  function convertLatexDelimiters(text: string): string {
+    // Convert \[ ... \] to $$ ... $$
+    text = text.replace(/\\\[(.*?)\\\]/gs, (_, expr) => `$$${expr}$$`);
+    // Convert \( ... \) to $ ... $
+    text = text.replace(/\\\((.*?)\\\)/gs, (_, expr) => `$${expr}$`);
+    return text;
+  }
+
   return (
     <div className={styles.page}>
       {/* Sidebar for system prompt */}
@@ -178,7 +186,9 @@ export default function Home() {
               <ReactMarkdown
                 remarkPlugins={[remarkMath]}
                 rehypePlugins={[rehypeKatex]}
-              >{m.content}</ReactMarkdown>
+              >
+                {convertLatexDelimiters(m.content)}
+              </ReactMarkdown>
             </div>
           ))}
           {loading && (
@@ -186,7 +196,9 @@ export default function Home() {
               <ReactMarkdown
                 remarkPlugins={[remarkMath]}
                 rehypePlugins={[rehypeKatex]}
-              >{"Thinking..."}</ReactMarkdown>
+              >
+                {convertLatexDelimiters("Thinking...")}
+              </ReactMarkdown>
             </div>
           )}
           <div ref={chatEndRef} />
