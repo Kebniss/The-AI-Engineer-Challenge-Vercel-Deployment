@@ -139,6 +139,16 @@ export default function Home() {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!loading) {
+        // Manually trigger form submission
+        (e.target as HTMLTextAreaElement).form?.requestSubmit();
+      }
+    }
+  };
+
   function convertLatexDelimiters(text: string): string {
     // Convert \[ ... \] to $$ ... $$
     text = text.replace(/\\\[(.*?)\\\]/gs, (_, expr) => `$$${expr}$$`);
@@ -214,6 +224,7 @@ export default function Home() {
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Ask me anything..."
             className={styles.textarea}
             rows={5}
