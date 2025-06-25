@@ -151,9 +151,9 @@ export default function Home() {
 
   function convertLatexDelimiters(text: string): string {
     // Convert \[ ... \] to $$ ... $$
-    text = text.replace(/\\\[(.*?)\\\]/gs, (_, expr) => `$$${expr}$$`);
+    text = text.replace(/\\\[((?:.|\n)*?)\\\]/g, (_, expr) => `$$${expr}$$`);
     // Convert \( ... \) to $ ... $
-    text = text.replace(/\\\((.*?)\\\)/gs, (_, expr) => `$${expr}$`);
+    text = text.replace(/\\\(((?:.|\n)*?)\\\)/g, (_, expr) => `$${expr}$`);
     return text;
   }
 
