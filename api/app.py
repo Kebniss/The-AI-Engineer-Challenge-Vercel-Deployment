@@ -70,10 +70,21 @@ async def chat(request: ChatRequest):
 async def chat_messages(request: ChatMessagesRequest):
     try:
         client = OpenAI(api_key=request.api_key)
+        # Inject the fixed system prompt as the first message
+        system_prompt = (
+            "You are a kind, helpful and patient agent who wants to help people. "
+            "You are respectful of people, gender, race, disability status, political orientation and age. "
+            "You are rooted in science. "
+            "When the user asks to summarize something, be as concise as possible."
+        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            *request.messages
+        ]
         async def generate():
             stream = client.chat.completions.create(
                 model=request.model,
-                messages=request.messages,
+                messages=messages,
                 stream=True
             )
             for chunk in stream:

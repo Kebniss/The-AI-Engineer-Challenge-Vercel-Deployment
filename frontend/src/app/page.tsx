@@ -2,9 +2,11 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./page.module.css";
 import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import 'katex/dist/katex.min.css';
 
 export default function Home() {
-  const [systemPrompt, setSystemPrompt] = useState("");
   const [input, setInput] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
@@ -50,7 +52,6 @@ export default function Home() {
           model: "gpt-4.1-mini",
           api_key: apiKey,
           messages: [
-            ...(systemPrompt.trim() ? [{ role: "system", content: systemPrompt }] : []),
             ...newMessages.map(m => ({ role: m.role, content: m.content }))
           ]
         }),
@@ -146,16 +147,6 @@ export default function Home() {
           <span className={styles.sidebarText}>🔮</span>
           <span className={styles.sidebarTitle}>LLM Chat</span>
         </div>
-        <div className={styles.promptContainer}>
-          <label className={styles.label}>Developer/System Prompt</label>
-          <textarea
-            value={systemPrompt}
-            onChange={e => setSystemPrompt(e.target.value)}
-            rows={4}
-            className={styles.textarea}
-            required
-          />
-        </div>
         <div className={styles.apiKeyContainer}>
           <label className={styles.label}>OpenAI API Key</label>
           <input
@@ -184,12 +175,18 @@ export default function Home() {
         <div className={styles.chatContainer}>
           {messages.map((m, i) => (
             <div key={i} className={`${styles.message} ${m.role === 'user' ? styles.user : styles.assistant}`}>
-              <ReactMarkdown>{m.content}</ReactMarkdown>
+              <ReactMarkdown
+                remarkPlugins={[remarkMath]}
+                rehypePlugins={[rehypeKatex]}
+              >{m.content}</ReactMarkdown>
             </div>
           ))}
           {loading && (
             <div className={`${styles.message} ${styles.assistant}`}>
-              <ReactMarkdown>{"Thinking..."}</ReactMarkdown>
+              <ReactMarkdown
+                remarkPlugins={[remarkMath]}
+                rehypePlugins={[rehypeKatex]}
+              >{"Thinking..."}</ReactMarkdown>
             </div>
           )}
           <div ref={chatEndRef} />
@@ -202,12 +199,13 @@ export default function Home() {
         )}
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          <input
-            type="text"
+          <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder="Ask me anything..."
-            className={styles.input}
+            className={styles.textarea}
+            rows={5}
+            style={{ maxHeight: '120px', minHeight: '40px', overflowY: 'auto' }}
           />
           <button type="submit" disabled={loading} className={styles.button}>
             {loading ? "..." : "Send"}

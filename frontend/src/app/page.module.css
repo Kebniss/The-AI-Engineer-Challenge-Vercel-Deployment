@@ -127,7 +127,7 @@
   flex-direction: column;
   gap: 16px;
   border-radius: 18px;
-  max-width: 80%;
+  width: 100%;
   line-height: 1.6;
   font-size: 16px;
   word-wrap: break-word;
@@ -140,6 +140,32 @@
   line-height: 1.6;
   font-size: 16px;
   word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+.message p {
+  white-space: pre-line;
+  margin-bottom: 1em;
+}
+
+/* Allow code blocks to scroll horizontally if needed */
+.message pre {
+  white-space: pre;
+  overflow-x: auto;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.message ul,
+.message ol {
+  margin-left: 1.5em;
+  padding-left: 1.5em;
+}
+
+.message li {
+  margin-bottom: 0.4em;
+  padding-left: 0.2em;
 }
 
 .user {
