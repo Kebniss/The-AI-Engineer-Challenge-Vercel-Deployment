@@ -4,7 +4,6 @@ import styles from "./page.module.css";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import 'katex/dist/katex.min.css';
 
 export default function Home() {
   const [input, setInput] = useState("");
