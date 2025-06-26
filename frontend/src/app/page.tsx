@@ -1,11 +1,9 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import styles from "./page.module.css";
-// import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import dynamic from "next/dynamic";
-const ReactMarkdown = dynamic(() => import("react-markdown"), { ssr: false });
 
 
 export default function Home() {
@@ -201,8 +199,8 @@ export default function Home() {
             return (
               <div key={i} className={`${styles.message} ${m.role === 'user' ? styles.user : styles.assistant}`}>
                 <ReactMarkdown
-                  remarkPlugins={[remarkMath]}
-                  rehypePlugins={[rehypeKatex]}
+                  remarkPlugins={[remarkMath.default || remarkMath]}
+                  rehypePlugins={[rehypeKatex.default || rehypeKatex]}
                 >
                   {content}
                 </ReactMarkdown>
