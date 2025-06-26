@@ -1,9 +1,12 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import styles from "./page.module.css";
-import ReactMarkdown from "react-markdown";
+// import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import dynamic from "next/dynamic";
+const ReactMarkdown = dynamic(() => import("react-markdown"), { ssr: false });
+
 
 export default function Home() {
   const [input, setInput] = useState("");
@@ -190,16 +193,22 @@ export default function Home() {
       {/* Main chat area */}
       <main className={styles.mainContent}>
         <div className={styles.chatContainer}>
-          {messages.map((m, i) => (
-            <div key={i} className={`${styles.message} ${m.role === 'user' ? styles.user : styles.assistant}`}>
-              <ReactMarkdown
-                remarkPlugins={[remarkMath]}
-                rehypePlugins={[rehypeKatex]}
-              >
-                {convertLatexDelimiters(m.content)}
-              </ReactMarkdown>
-            </div>
-          ))}
+          {messages.map((m, i) => {
+            const content = convertLatexDelimiters(m.content);
+            if (m.role === "assistant") {
+              console.log("Rendering assistant message:", content);
+            }
+            return (
+              <div key={i} className={`${styles.message} ${m.role === 'user' ? styles.user : styles.assistant}`}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkMath]}
+                  rehypePlugins={[rehypeKatex]}
+                >
+                  {content}
+                </ReactMarkdown>
+              </div>
+            );
+          })}
           {loading && (
             <div className={`${styles.message} ${styles.assistant}`}>
               <ReactMarkdown
