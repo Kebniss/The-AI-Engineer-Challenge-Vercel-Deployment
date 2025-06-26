@@ -152,8 +152,12 @@ export default function Home() {
   function convertLatexDelimiters(text: string): string {
     // Convert \[ ... \] to $$ ... $$
     text = text.replace(/\\\[((?:.|\n)*?)\\\]/g, (_, expr) => `$$${expr}$$`);
+    // Convert [ ... ] to $$ ... $$
+    text = text.replace(/\\[((?:.|\n)*?)\\]/g, (_, expr) => `$$${expr}$$`);
     // Convert \( ... \) to $ ... $
     text = text.replace(/\\\(((?:.|\n)*?)\\\)/g, (_, expr) => `$${expr}$`);
+    // Convert ( ... ) to $ ... $
+    text = text.replace(/\\(((?:.|\n)*?)\\)/g, (_, expr) => `$${expr}$`);
     return text;
   }
 
@@ -199,8 +203,8 @@ export default function Home() {
             return (
               <div key={i} className={`${styles.message} ${m.role === 'user' ? styles.user : styles.assistant}`}>
                 <ReactMarkdown
-                  remarkPlugins={[remarkMath.default || remarkMath]}
-                  rehypePlugins={[rehypeKatex.default || rehypeKatex]}
+                  remarkPlugins={[remarkMath]}
+                  rehypePlugins={[rehypeKatex]}
                 >
                   {content}
                 </ReactMarkdown>
