@@ -1,7 +1,16 @@
 :root {
-  --background-start-rgb: 2, 0, 36;
-  --background-end-rgb: 21, 9, 71;
-  --foreground: #ededed;
+  /* Color palette for Advocate app */
+  --background-main: #f7ecd7;
+  /* Pale yellow / wood */
+  --background-content: #fffdfa;
+  /* Soft white */
+  --accent-periwinkle: #8f99e6;
+  /* Periwinkle for borders and accents */
+  --text-main: #3d2c1e;
+  /* Deep brown for professional contrast */
+  --border-radius: 12px;
+  --shadow: 0 2px 8px rgba(143, 153, 230, 0.08);
+  /* Soft periwinkle shadow */
 }
 
 html,
@@ -12,13 +21,23 @@ body {
 }
 
 body {
-  color: var(--foreground);
-  background: linear-gradient(180deg,
-      rgb(var(--background-start-rgb)) 0%,
-      rgb(var(--background-end-rgb)) 100%);
+  color: var(--text-main);
+  background: var(--background-main);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* Main content area styling suggestion */
+.main-content {
+  background: var(--background-content);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  border: 1.5px solid var(--accent-periwinkle);
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 900px;
 }
 
 * {
@@ -28,6 +47,12 @@ body {
 }
 
 a {
-  color: inherit;
+  color: var(--accent-periwinkle);
   text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #7c5dc9;
+  /* Deeper lilac on hover */
 }

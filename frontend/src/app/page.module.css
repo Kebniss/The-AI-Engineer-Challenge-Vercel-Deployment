@@ -2,12 +2,14 @@
   display: flex;
   height: 100vh;
   font-family: 'Montserrat', 'Futura', 'Arial', sans-serif;
+  background: var(--background-main);
 }
 
 .sidebar {
   width: 320px;
-  background-color: rgba(1, 2, 28, 0.8);
-  border-right: 1px solid #7c3aed;
+  background-color: #f7ecd7cc;
+  /* semi-transparent pale yellow/wood */
+  border-right: 2px solid var(--accent-periwinkle);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,8 +25,8 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  color: #f87171;
-  text-shadow: 0 0 10px #f87171;
+  color: var(--accent-periwinkle);
+  text-shadow: 0 0 10px #e6d6fa;
 }
 
 .sidebarTitle {
@@ -56,32 +58,32 @@
 
 .label {
   font-weight: 600;
-  color: #c4b5fd;
+  color: var(--accent-periwinkle);
   margin-bottom: 6px;
 }
 
 .textarea {
   width: 100%;
   border-radius: 12px;
-  border: 1.5px solid #7c3aed;
+  border: 1.5px solid var(--accent-periwinkle);
   padding: 10px;
   font-size: 15px;
-  background: rgba(1, 2, 28, 0.8);
-  color: #ddd;
+  background: var(--background-content);
+  color: var(--text-main);
   resize: vertical;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow);
 }
 
 .apiKeyInput {
   width: 100%;
   margin-top: 6px;
   border-radius: 12px;
-  border: 1.5px solid #7c3aed;
+  border: 1.5px solid var(--accent-periwinkle);
   padding: 10px;
   font-size: 15px;
-  background: rgba(1, 2, 28, 0.8);
-  color: #ddd;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  background: var(--background-content);
+  color: var(--text-main);
+  box-shadow: var(--shadow);
 }
 
 .apiKeyContainer {
@@ -93,18 +95,18 @@
   width: 100%;
   padding: 10px;
   border-radius: 12px;
-  border: 1.5px solid #f87171;
-  background: rgba(248, 113, 113, 0.2);
-  color: #f87171;
+  border: 1.5px solid #e6d6fa;
+  background: #f7ecd7;
+  color: var(--accent-periwinkle);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-shadow: 0 0 5px #f87171;
+  text-shadow: 0 0 5px #e6d6fa;
 }
 
 .clearButton:hover {
-  background: rgba(248, 113, 113, 0.4);
-  box-shadow: 0 0 10px #f87171;
+  background: #fffdfa;
+  box-shadow: 0 0 10px #e6d6fa;
 }
 
 .mainContent {
@@ -114,10 +116,9 @@
   height: 100vh;
   overflow: hidden;
   min-width: 0;
+  background: var(--background-content);
   background-size: 40px 40px;
-  background-image:
-    linear-gradient(to right, rgba(124, 58, 237, 0.2) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(124, 58, 237, 0.2) 1px, transparent 1px);
+  border-left: 2px solid var(--accent-periwinkle);
 }
 
 .chatContainer {
@@ -144,6 +145,10 @@
   font-size: 16px;
   word-wrap: break-word;
   overflow-wrap: anywhere;
+  background: var(--background-main);
+  color: var(--text-main);
+  border: 1.5px solid var(--accent-periwinkle);
+  box-shadow: var(--shadow);
 }
 
 .message p {
@@ -172,17 +177,17 @@
 }
 
 .user {
-  background-color: rgba(24, 1, 62, 0.8);
-  color: #c4b5fd;
+  background-color: #fffdfa;
+  color: var(--text-main);
   align-self: flex-end;
-  border: 1px solid #7c3aed;
+  border: 1.5px solid var(--accent-periwinkle);
 }
 
 .assistant {
-  background-color: rgba(1, 2, 28, 0.8);
-  color: #a78bfa;
+  background-color: #f7ecd7;
+  color: var(--text-main);
   align-self: flex-start;
-  border: 1px solid #4f46e5;
+  border: 1.5px solid var(--accent-periwinkle);
 }
 
 .assistant a {
@@ -198,9 +203,8 @@
   display: flex;
   gap: 16px;
   padding: 24px;
-  border-top: 1px solid #7c3aed;
-  background: rgba(1, 2, 28, 0.8);
-  flex-shrink: 0;
+  background: var(--background-content);
+  border-top: 1.5px solid var(--accent-periwinkle);
 }
 
 .input {
@@ -214,35 +218,36 @@
 }
 
 .button {
-  padding: 16px 24px;
-  border-radius: 12px;
+  background: var(--accent-periwinkle);
+  color: var(--background-content);
   border: none;
-  background: #7c3aed;
-  color: white;
+  border-radius: 12px;
+  padding: 10px 24px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  text-shadow: 0 0 5px white;
+  transition: background 0.2s;
+  box-shadow: var(--shadow);
 }
 
 .button:hover {
-  background: #a78bfa;
-  box-shadow: 0 0 15px #a78bfa;
+  background: #7c5dc9;
 }
 
 .button:disabled {
-  background: #4c1d95;
+  background: #e6d6fa;
+  color: #b9a6e8;
   cursor: not-allowed;
 }
 
 .error {
-  margin: 0 24px;
-  padding: 16px;
-  background: rgba(248, 113, 113, 0.2);
-  color: #f87171;
-  border: 1.5px solid #f87171;
-  border-radius: 12px;
-  white-space: pre-wrap;
+  color: #b91c1c;
+  background: #fff0f0;
+  border: 1.5px solid #b91c1c;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+  font-size: 1rem;
 }
 
 .pdfUploadButton {

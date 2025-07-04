@@ -201,8 +201,8 @@ export default function Home() {
       {/* Sidebar for system prompt */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <span className={styles.sidebarText}>🔮</span>
-          <span className={styles.sidebarTitle}>LLM Chat</span>
+          <span className={styles.sidebarText}>🏠</span>
+          <span className={styles.sidebarTitle}>Advocate</span>
         </div>
         {/* PDF Upload Option */}
         <div style={{ width: "100%", margin: "16px 0", display: "flex", flexDirection: "column", alignItems: "center" }}>
