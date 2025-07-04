@@ -1,5 +1,5 @@
 # Import required FastAPI components for building the API
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 # Import Pydantic for data validation and settings management
@@ -8,6 +8,12 @@ from pydantic import BaseModel
 from openai import OpenAI
 import os
 from typing import Optional, List, Dict, Union
+from aimakerspace.text_utils import PDFLoader, CharacterTextSplitter
+from aimakerspace.vectordatabase import VectorDatabase
+from aimakerspace.openai_utils.embedding import EmbeddingModel
+import tempfile
+import shutil
+import asyncio
 
 # Initialize FastAPI application with a title
 app = FastAPI(title="OpenAI Chat API")
@@ -34,6 +40,42 @@ class ChatMessagesRequest(BaseModel):
     messages: List[Dict[str, str]]  # List of {role, content} dicts
     model: Optional[str] = "gpt-4.1-mini"
     api_key: str
+
+# Global in-memory storage for the PDF index (prototype)
+pdf_vector_db = None
+pdf_chunks = None
+
+@app.post("/api/upload-pdf")
+async def upload_pdf(file: UploadFile = File(...)):
+    """
+    Accepts a PDF file upload, extracts and chunks its text, and builds an in-memory vector index.
+    Returns the number of chunks indexed.
+    """
+    global pdf_vector_db, pdf_chunks
+    if file.content_type != "application/pdf":
+        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+    try:
+        # Save uploaded file to a temporary location
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            shutil.copyfileobj(file.file, tmp)
+            tmp_path = tmp.name
+        # Extract text from PDF
+        loader = PDFLoader(tmp_path)
+        texts = loader.load_documents()  # List of extracted text (usually one item)
+        # Chunk the text
+        splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        chunks = splitter.split_texts(texts)
+        pdf_chunks = chunks  # Store for later retrieval
+        # Build vector database asynchronously
+        embedding_model = EmbeddingModel()
+        vector_db = VectorDatabase(embedding_model)
+        await vector_db.abuild_from_list(chunks)
+        pdf_vector_db = vector_db
+        # Clean up temp file
+        os.remove(tmp_path)
+        return {"status": "success", "chunks_indexed": len(chunks)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process PDF: {str(e)}")
 
 # Define the main chat endpoint that handles POST requests
 @app.post("/api/chat")
