@@ -205,18 +205,25 @@ export default function Home() {
           <span className={styles.sidebarTitle}>LLM Chat</span>
         </div>
         {/* PDF Upload Option */}
-        <div style={{ width: "100%", margin: "16px 0" }}>
+        <div style={{ width: "100%", margin: "16px 0", display: "flex", flexDirection: "column", alignItems: "center" }}>
           <label className={styles.label} htmlFor="pdf-upload">Add PDF</label>
           <input
             id="pdf-upload"
             type="file"
             accept="application/pdf"
-            style={{ width: "100%", marginTop: 6 }}
+            className={styles.pdfInputHidden}
             onChange={handlePdfUpload}
             ref={pdfInputRef}
           />
+          <button
+            type="button"
+            className={styles.pdfUploadButton}
+            onClick={() => pdfInputRef.current?.click()}
+          >
+            Upload PDF
+          </button>
           {pdfUploadStatus && (
-            <div style={{ color: pdfUploadStatus.startsWith("PDF indexed") ? "#a7f3d0" : "#f87171", marginTop: 6, fontSize: 14 }}>
+            <div style={{ color: pdfUploadStatus.startsWith("PDF indexed") ? "#a7f3d0" : "#f87171", marginTop: 6, fontSize: 14, textAlign: "center" }}>
               {pdfUploadStatus}
             </div>
           )}

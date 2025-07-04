@@ -244,3 +244,29 @@
   border-radius: 12px;
   white-space: pre-wrap;
 }
+
+.pdfUploadButton {
+  width: 80%;
+  margin: 0 auto 8px auto;
+  display: block;
+  padding: 12px 0;
+  border-radius: 12px;
+  border: 1.5px solid #7c3aed;
+  background: rgba(124, 58, 237, 0.2);
+  color: #a78bfa;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 5px #a78bfa;
+  text-align: center;
+}
+
+.pdfUploadButton:hover {
+  background: rgba(124, 58, 237, 0.4);
+  box-shadow: 0 0 10px #a78bfa;
+}
+
+.pdfInputHidden {
+  display: none;
+}
