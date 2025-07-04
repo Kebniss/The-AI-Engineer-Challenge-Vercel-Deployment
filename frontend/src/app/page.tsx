@@ -13,6 +13,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [pdfUploadStatus, setPdfUploadStatus] = useState<string>("");
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   // Scroll to bottom on new message
   useEffect(() => {
@@ -161,6 +163,39 @@ export default function Home() {
     return text;
   }
 
+  // Handle PDF upload
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPdfUploadStatus("");
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    if (file.type !== "application/pdf") {
+      setPdfUploadStatus("Only PDF files are supported.");
+      return;
+    }
+    setPdfUploadStatus("Uploading and indexing PDF...");
+    try {
+      const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+      const apiUrl = isLocal
+        ? "http://localhost:8000/api/upload-pdf"
+        : "/api/upload-pdf";
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setPdfUploadStatus(data.detail || `Upload failed: ${res.status}`);
+        return;
+      }
+      const data = await res.json();
+      setPdfUploadStatus(`PDF indexed! Chunks: ${data.chunks_indexed}`);
+    } catch (err) {
+      setPdfUploadStatus(`Upload error: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
   return (
     <div className={styles.page}>
       {/* Sidebar for system prompt */}
@@ -168,6 +203,23 @@ export default function Home() {
         <div className={styles.sidebarHeader}>
           <span className={styles.sidebarText}>🔮</span>
           <span className={styles.sidebarTitle}>LLM Chat</span>
+        </div>
+        {/* PDF Upload Option */}
+        <div style={{ width: "100%", margin: "16px 0" }}>
+          <label className={styles.label} htmlFor="pdf-upload">Add PDF</label>
+          <input
+            id="pdf-upload"
+            type="file"
+            accept="application/pdf"
+            style={{ width: "100%", marginTop: 6 }}
+            onChange={handlePdfUpload}
+            ref={pdfInputRef}
+          />
+          {pdfUploadStatus && (
+            <div style={{ color: pdfUploadStatus.startsWith("PDF indexed") ? "#a7f3d0" : "#f87171", marginTop: 6, fontSize: 14 }}>
+              {pdfUploadStatus}
+            </div>
+          )}
         </div>
         <div className={styles.apiKeyContainer}>
           <label className={styles.label}>OpenAI API Key</label>
