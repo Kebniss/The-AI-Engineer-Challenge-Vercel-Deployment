@@ -41,6 +41,12 @@ class ChatMessagesRequest(BaseModel):
     model: Optional[str] = "gpt-4.1-mini"
     api_key: str
 
+class PDFChatRequest(BaseModel):
+    query: str
+    api_key: str
+    model: Optional[str] = "gpt-4.1-mini"
+    top_k: Optional[int] = 3
+
 # Global in-memory storage for the PDF index (prototype)
 pdf_vector_db = None
 pdf_chunks = None
@@ -135,6 +141,39 @@ async def chat_messages(request: ChatMessagesRequest):
         return StreamingResponse(generate(), media_type="text/plain")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/chat-pdf")
+async def chat_pdf(request: PDFChatRequest):
+    """
+    Accepts a user query, retrieves relevant chunks from the indexed PDF, and generates an answer using OpenAI and the retrieved context.
+    """
+    global pdf_vector_db, pdf_chunks
+    if pdf_vector_db is None or pdf_chunks is None:
+        raise HTTPException(status_code=400, detail="No PDF has been uploaded and indexed yet.")
+    try:
+        # Retrieve top-k relevant chunks
+        top_k = request.top_k or 3
+        results = pdf_vector_db.search_by_text(request.query, k=top_k, return_as_text=True)
+        context = "\n---\n".join(results)
+        # Compose prompt for OpenAI
+        prompt = (
+            f"You are a helpful assistant. Use the following PDF context to answer the user's question.\n"
+            f"Context:\n{context}\n\nQuestion: {request.query}\nAnswer:"
+        )
+        client = OpenAI(api_key=request.api_key)
+        # Streaming response
+        async def generate():
+            stream = client.chat.completions.create(
+                model=request.model,
+                messages=[{"role": "system", "content": prompt}],
+                stream=True
+            )
+            for chunk in stream:
+                if chunk.choices[0].delta.content is not None:
+                    yield chunk.choices[0].delta.content
+        return StreamingResponse(generate(), media_type="text/plain")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to chat with PDF: {str(e)}")
 
 # Define a health check endpoint to verify API status
 @app.get("/api/health")
