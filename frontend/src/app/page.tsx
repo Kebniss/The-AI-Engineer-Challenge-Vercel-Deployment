@@ -13,8 +13,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const [pdfUploadStatus, setPdfUploadStatus] = useState<string>("");
-  const pdfInputRef = useRef<HTMLInputElement>(null);
+
   // State for file upload menu
   const [fileMenuOpen, setFileMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -187,50 +186,50 @@ export default function Home() {
     return text;
   }
 
-  // Handle PDF upload
-  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPdfUploadStatus("");
-    if (!e.target.files || e.target.files.length === 0) return;
-    const file = e.target.files[0];
-    if (file.type !== "application/pdf") {
-      setPdfUploadStatus("Only PDF files are supported.");
-      return;
-    }
-    if (!apiKey.trim()) {
-      setPdfUploadStatus("Please enter your OpenAI API key before uploading a PDF.");
-      return;
-    }
-    setPdfUploadStatus("Uploading and indexing PDF...");
-    try {
-      const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
-      const apiUrl = isLocal
-        ? "http://localhost:8000/api/upload-pdf"
-        : "/api/upload-pdf";
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("api_key", apiKey);
-      const res = await fetch(apiUrl, {
-        method: "POST",
-        body: formData,
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        let detail = data.detail;
-        if (Array.isArray(detail)) {
-          detail = detail.map(d => d.msg || JSON.stringify(d)).join(' | ');
-        } else if (detail && typeof detail === "object") {
-          detail = detail.msg || JSON.stringify(detail, null, 2);
-        }
-        setPdfUploadStatus(detail || `Upload failed: ${res.status}`);
-        return;
-      }
-      const data = await res.json();
-      setPdfUploadStatus(`PDF indexed! Chunks: ${data.chunks_indexed}`);
-      setPdfUploaded(true);
-    } catch (err) {
-      setPdfUploadStatus(`Upload error: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  };
+  // Handle PDF upload - currently unused but kept for future implementation
+  // const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setPdfUploadStatus("");
+  //   if (!e.target.files || e.target.files.length === 0) return;
+  //   const file = e.target.files[0];
+  //   if (file.type !== "application/pdf") {
+  //     setPdfUploadStatus("Only PDF files are supported.");
+  //     return;
+  //   }
+  //   if (!apiKey.trim()) {
+  //     setPdfUploadStatus("Please enter your OpenAI API key before uploading a PDF.");
+  //     return;
+  //   }
+  //   setPdfUploadStatus("Uploading and indexing PDF...");
+  //   try {
+  //     const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+  //     const apiUrl = isLocal
+  //       ? "http://localhost:8000/api/upload-pdf"
+  //       : "/api/upload-pdf";
+  //     const formData = new FormData();
+  //     formData.append("file", file);
+  //     formData.append("api_key", apiKey);
+  //     const res = await fetch(apiUrl, {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+  //     if (!res.ok) {
+  //       const data = await res.json().catch(() => ({}));
+  //       let detail = data.detail;
+  //       if (Array.isArray(detail)) {
+  //         detail = detail.map(d => d.msg || JSON.stringify(d)).join(' | ');
+  //       } else if (detail && typeof detail === "object") {
+  //         detail = detail.msg || JSON.stringify(detail, null, 2);
+  //       }
+  //       setPdfUploadStatus(detail || `Upload failed: ${res.status}`);
+  //       return;
+  //     }
+  //     const data = await res.json();
+  //     setPdfUploadStatus(`PDF indexed! Chunks: ${data.chunks_indexed}`);
+  //     setPdfUploaded(true);
+  //   } catch (err) {
+  //     setPdfUploadStatus(`Upload error: ${err instanceof Error ? err.message : String(err)}`);
+  //   }
+  // };
 
   // Handler for file input
   const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -297,7 +296,7 @@ export default function Home() {
   // Handler for clicking outside the menu to close it
   useEffect(() => {
     if (!fileMenuOpen) return;
-    function handleClick(e: MouseEvent) {
+    function handleClick() {
       setFileMenuOpen(false);
     }
     document.addEventListener("mousedown", handleClick);
@@ -329,7 +328,6 @@ export default function Home() {
             setError("");
             setLoading(false);
             setPdfUploaded(false);
-            setPdfUploadStatus("");
             setUploadedFileName("");
             setUploadStatus("");
           }}
