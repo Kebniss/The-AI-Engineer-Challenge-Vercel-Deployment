@@ -21,6 +21,8 @@ export default function Home() {
   const [uploadedFileName, setUploadedFileName] = useState<string>("");
   // Upload status for feedback
   const [uploadStatus, setUploadStatus] = useState<string>("");
+  // Track if a PDF has been uploaded successfully
+  const [pdfUploaded, setPdfUploaded] = useState<boolean>(false);
 
   // Scroll to bottom on new message
   useEffect(() => {
@@ -48,21 +50,37 @@ export default function Home() {
     setLoading(true);
     try {
       const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+
+      // Use PDF chat endpoint if a PDF has been uploaded, otherwise use regular chat
       const apiUrl = isLocal
-        ? "http://localhost:8000/api/chat-messages"
-        : "/api/chat-messages";
-      const res = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+        ? (pdfUploaded
+          ? "http://localhost:8000/api/chat-pdf"
+          : "http://localhost:8000/api/chat-messages")
+        : (pdfUploaded
+          ? "/api/chat-pdf"
+          : "/api/chat-messages");
+
+      const requestBody = pdfUploaded
+        ? {
+          query: input,
+          api_key: apiKey,
+          model: "gpt-4.1-mini",
+          top_k: 3
+        }
+        : {
           model: "gpt-4.1-mini",
           api_key: apiKey,
           messages: [
             ...newMessages.map(m => ({ role: m.role, content: m.content }))
           ]
-        }),
+        };
+
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
       });
       if (!res.ok || !res.body) {
         const errorMsg = `API error: ${res.status}`;
@@ -208,6 +226,7 @@ export default function Home() {
       }
       const data = await res.json();
       setPdfUploadStatus(`PDF indexed! Chunks: ${data.chunks_indexed}`);
+      setPdfUploaded(true);
     } catch (err) {
       setPdfUploadStatus(`Upload error: ${err instanceof Error ? err.message : String(err)}`);
     }
@@ -261,6 +280,9 @@ export default function Home() {
         }
         const data = await res.json();
         setUploadStatus(`File uploaded!${isPdf && data.chunks_indexed ? ` Chunks: ${data.chunks_indexed}` : ""}`);
+        if (isPdf && data.chunks_indexed) {
+          setPdfUploaded(true);
+        }
       } catch (err) {
         setUploadStatus(`Upload error: ${err instanceof Error ? err.message : String(err)}`);
       }
@@ -313,6 +335,11 @@ export default function Home() {
               {pdfUploadStatus}
             </div>
           )}
+          {pdfUploaded && (
+            <div style={{ color: "#a7f3d0", marginTop: 6, fontSize: 12, textAlign: "center", fontStyle: "italic" }}>
+              ✓ PDF ready for questions
+            </div>
+          )}
         </div>
         <div className={styles.apiKeyContainer}>
           <label className={styles.label}>OpenAI API Key</label>
@@ -330,6 +357,10 @@ export default function Home() {
             setInput("");
             setError("");
             setLoading(false);
+            setPdfUploaded(false);
+            setPdfUploadStatus("");
+            setUploadedFileName("");
+            setUploadStatus("");
           }}
           className={styles.clearButton}
         >
