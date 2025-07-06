@@ -405,7 +405,7 @@ export default function Home() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask me anything..."
+            placeholder="Welcome to Advocate! I am here to help with questions about building code and home maintenance. Ask me anything..."
             className={styles.textarea}
             rows={5}
             style={{ maxHeight: '120px', minHeight: '40px', overflowY: 'auto' }}
