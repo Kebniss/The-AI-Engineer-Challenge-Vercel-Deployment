@@ -1,5 +1,5 @@
 ---
-description: 
+description: This app will allow the user to ask questions about fixing things around the house. I would like you to help me develop that. If you do not know how to do something I ask or if you are stumped please say so. Write down what you understand and what you tried and where you are blocked. Ask for extra information like logs, screenshots, calls to backend functions. I will be happy to fetch them and help you figure things out. You have the whole codebase a and rules in your context
 globs: 
 alwaysApply: true
 ---
