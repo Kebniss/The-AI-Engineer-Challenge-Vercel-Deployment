@@ -275,3 +275,71 @@
 .pdfInputHidden {
   display: none;
 }
+
+.plusMenuWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+
+.plusButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-periwinkle);
+  background: #fffdfa;
+  color: var(--accent-periwinkle);
+  font-size: 1.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  margin-right: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.plusButton:hover {
+  background: #f7ecd7;
+  box-shadow: 0 0 8px #e6d6fa;
+}
+
+.fileMenu {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  background: #fffdfa;
+  border: 1.5px solid var(--accent-periwinkle);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(143, 153, 230, 0.15);
+  z-index: 10;
+  min-width: 180px;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.fileMenuItem {
+  background: none;
+  border: none;
+  color: var(--accent-periwinkle);
+  font-size: 1rem;
+  padding: 10px 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.fileMenuItem:hover {
+  background: #f7ecd7;
+}
+
+.uploadedFileName {
+  margin-left: 24px;
+  margin-top: 4px;
+  color: var(--accent-periwinkle);
+  font-size: 0.95rem;
+  font-style: italic;
+}
