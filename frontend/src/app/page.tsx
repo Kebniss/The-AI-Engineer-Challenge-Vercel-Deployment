@@ -312,35 +312,6 @@ export default function Home() {
           <span className={styles.sidebarText}>🏠</span>
           <span className={styles.sidebarTitle}>Advocate</span>
         </div>
-        {/* PDF Upload Option */}
-        <div style={{ width: "100%", margin: "16px 0", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <label className={styles.label} htmlFor="pdf-upload">Add PDF</label>
-          <input
-            id="pdf-upload"
-            type="file"
-            accept="application/pdf"
-            className={styles.pdfInputHidden}
-            onChange={handlePdfUpload}
-            ref={pdfInputRef}
-          />
-          <button
-            type="button"
-            className={styles.pdfUploadButton}
-            onClick={() => pdfInputRef.current?.click()}
-          >
-            Upload PDF
-          </button>
-          {pdfUploadStatus && (
-            <div style={{ color: pdfUploadStatus.startsWith("PDF indexed") ? "#a7f3d0" : "#f87171", marginTop: 6, fontSize: 14, textAlign: "center" }}>
-              {pdfUploadStatus}
-            </div>
-          )}
-          {pdfUploaded && (
-            <div style={{ color: "#a7f3d0", marginTop: 6, fontSize: 12, textAlign: "center", fontStyle: "italic" }}>
-              ✓ PDF ready for questions
-            </div>
-          )}
-        </div>
         <div className={styles.apiKeyContainer}>
           <label className={styles.label}>OpenAI API Key</label>
           <input
