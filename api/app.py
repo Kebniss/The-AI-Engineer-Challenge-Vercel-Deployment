@@ -66,26 +66,43 @@ async def upload_pdf(file: UploadFile = File(...), api_key: str = Form(...)):
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
     try:
+        print(f"Starting PDF upload processing for file: {file.filename}")
         # Save uploaded file to a temporary location
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             shutil.copyfileobj(file.file, tmp)
             tmp_path = tmp.name
+        print(f"PDF saved to temporary file: {tmp_path}")
+        
         # Extract text from PDF
+        print("Loading PDF with PDFLoader...")
         loader = PDFLoader(tmp_path)
         texts = loader.load_documents()  # List of extracted text (usually one item)
+        print(f"Extracted {len(texts)} text chunks from PDF")
+        
         # Chunk the text with smaller chunks to avoid token limits
+        print("Splitting text into chunks...")
         splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=100)
         chunks = splitter.split_texts(texts)
         pdf_chunks = chunks  # Store for later retrieval
+        print(f"Created {len(chunks)} chunks from PDF text")
+        
         # Build vector database asynchronously, using the provided api_key
+        print("Building vector database...")
         embedding_model = EmbeddingModel(api_key=api_key)
         vector_db = VectorDatabase(embedding_model)
         await vector_db.abuild_from_list(chunks)
         pdf_vector_db = vector_db
+        print("Vector database built successfully")
+        
         # Clean up temp file
         os.remove(tmp_path)
+        print("Temporary file cleaned up")
+        
         return {"status": "success", "chunks_indexed": len(chunks)}
     except Exception as e:
+        print(f"Error in upload_pdf: {str(e)}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Failed to process PDF: {str(e)}")
 
 @app.post("/api/upload-file")
