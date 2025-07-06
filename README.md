@@ -28,6 +28,12 @@ Our FastAPI backend is now more powerful and resilient.
 - **Streaming:** Supports real-time, streaming responses for a dynamic chat experience.
 - **Compatibility:** Backward compatible with the original `/api/chat` endpoint.
 
+#### **PDF Processing & RAG Support**
+- **PDF Upload Endpoint:** `/api/upload-pdf` - Handles PDF file uploads, text extraction, and vector indexing.
+- **PDF Chat Endpoint:** `/api/chat-pdf` - Enables question-answering based on uploaded PDF content.
+- **Smart Token Management:** Batch processing prevents token limit errors when processing large documents.
+- **Vector Search:** Retrieves the most relevant PDF chunks for each user question.
+
 #### **Robust Error Handling**
 - **Comprehensive Scenarios:** Handles invalid/missing API keys, rate limiting, network errors, malformed requests, and server errors.
 - **Clear Messages:** Provides detailed, actionable error messages to help you troubleshoot with ease.
@@ -53,6 +59,27 @@ The frontend has been rebuilt from the ground up with a focus on a clean, modern
 #### **Advanced Error Handling & Recovery**
 - **User-Friendly Alerts:** Clear, visual error messages for issues like invalid API keys, network problems, or rate limits.
 - **Actionable Steps:** Instructions to help you recover from errors and retry.
+
+### 📄 PDF Chat & Document Q&A
+
+The application now supports intelligent document-based conversations through PDF upload and retrieval-augmented generation (RAG).
+
+#### **PDF Upload & Processing**
+- **Smart Chunking:** Large PDFs are automatically split into manageable chunks (500 characters with 100 character overlap) to avoid token limits.
+- **Batch Processing:** Embeddings are processed in intelligent batches to handle large documents efficiently.
+- **Progress Feedback:** Real-time status updates during PDF processing and indexing.
+
+#### **Intelligent Document Q&A**
+- **Context-Aware Responses:** When a PDF is uploaded, the AI automatically switches to document-aware mode.
+- **Relevant Information Retrieval:** Questions are answered based on the actual content of the uploaded PDF.
+- **Visual Indicators:** Clear status indicators show when a PDF is ready for questions.
+- **Seamless Integration:** The same chat interface works for both general conversation and PDF-specific queries.
+
+#### **Technical Implementation**
+- **Vector Database:** Uses in-memory vector storage for fast similarity search.
+- **Embedding Model:** Leverages OpenAI's text-embedding-3-small for efficient text representation.
+- **Dynamic Endpoint Selection:** Automatically chooses between general chat (`/api/chat-messages`) and PDF chat (`/api/chat-pdf`) endpoints.
+- **Token Limit Management:** Intelligent batch processing prevents hitting OpenAI's 300,000 token limit.
 
 ### 🛡️ Security & Best Practices
 - **API Key Security:** Your API key is stored only in the frontend's state and is never persisted.
@@ -111,6 +138,7 @@ Open `http://localhost:3000` in your browser, enter your OpenAI API key, and sta
 
 - **System Prompt:** Use the optional system prompt to guide the AI's behavior (e.g., "You are a helpful coding assistant").
 - **Chat Features:** Use `Shift+Enter` for new lines, format your messages with Markdown, and click "New Chat" to start a new conversation.
+- **PDF Q&A:** Upload a PDF document and ask questions about its content. The AI will search through the document to provide relevant answers.
 - **Error Recovery:** If you encounter an error, check your API key, network connection, or wait a few seconds if you've been rate-limited.
 
 ---
