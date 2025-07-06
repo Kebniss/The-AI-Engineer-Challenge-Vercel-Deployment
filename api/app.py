@@ -83,6 +83,51 @@ async def upload_pdf(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process PDF: {str(e)}")
 
+@app.post("/api/upload-file")
+async def upload_file(file: UploadFile = File(...)):
+    """
+    Accepts image file uploads (PNG, JPEG, HEIF, HEIC) for home repair Q&A.
+    Returns success status and file information.
+    """
+    # Define supported image types
+    supported_types = [
+        "image/png",
+        "image/jpeg", 
+        "image/heif",
+        "image/heic"
+    ]
+    
+    if file.content_type not in supported_types:
+        raise HTTPException(
+            status_code=400, 
+            detail="Only PNG, JPEG, HEIF, HEIC image files are supported."
+        )
+    
+    try:
+        # Save uploaded file to a temporary location
+        file_extension = file.filename.split('.')[-1] if file.filename else 'jpg'
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_extension}") as tmp:
+            shutil.copyfileobj(file.file, tmp)
+            tmp_path = tmp.name
+        
+        # For now, we'll just store the file info and return success
+        # In a full implementation, you might want to:
+        # 1. Process the image with computer vision
+        # 2. Extract text or identify objects
+        # 3. Store in a database for later retrieval
+        
+        # Clean up temp file
+        os.remove(tmp_path)
+        
+        return {
+            "status": "success", 
+            "filename": file.filename,
+            "content_type": file.content_type,
+            "size": file.size
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
+
 # Define the main chat endpoint that handles POST requests
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
@@ -120,10 +165,13 @@ async def chat_messages(request: ChatMessagesRequest):
         client = OpenAI(api_key=request.api_key)
         # Inject the fixed system prompt as the first message
         system_prompt = (
-            "You are a kind, helpful and patient agent who wants to help people. "
-            "You are respectful of people, gender, race, disability status, political orientation and age. "
-            "You are rooted in science. "
-            "When the user asks to summarize something, be as concise as possible."
+            "You are a knowledgeable and helpful home repair assistant. "
+            "You specialize in helping people fix things around the house, from simple DIY projects to more complex repairs. "
+            "You provide clear, step-by-step instructions and safety advice. "
+            "You are respectful, patient, and always prioritize safety. "
+            "When users upload images of problems, you can help diagnose issues and suggest solutions. "
+            "You recommend appropriate tools and materials, and always suggest calling a professional for complex electrical, plumbing, or structural issues. "
+            "You are rooted in practical knowledge and best practices for home maintenance and repair."
         )
         messages = [
             {"role": "system", "content": system_prompt},
