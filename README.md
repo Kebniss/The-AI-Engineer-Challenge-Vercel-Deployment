@@ -72,6 +72,7 @@ The application now supports intelligent document-based conversations through PD
 #### **Intelligent Document Q&A**
 - **Context-Aware Responses:** When a PDF is uploaded, the AI automatically switches to document-aware mode.
 - **Relevant Information Retrieval:** Questions are answered based on the actual content of the uploaded PDF.
+- **Out-of-Context Handling:** The LLM is instructed to reply with "I don't know" when users ask questions outside the context provided by the uploaded PDF, ensuring responses are grounded in the document content.
 - **Visual Indicators:** Clear status indicators show when a PDF is ready for questions.
 - **Seamless Integration:** The same chat interface works for both general conversation and PDF-specific queries.
 
