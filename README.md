@@ -136,6 +136,31 @@ This application is optimized for deployment on [Vercel](https://vercel.com/).
 
 You've built and deployed an advanced, LLM-powered chat application! Share your results and experience on LinkedIn.
 
+## Future Features
+
+### File Picker UX: One-Step vs Two-Step
+
+**Current Implementation:**
+- Clicking the '+' button immediately opens the file picker for images and PDFs.
+- This is due to browser security: file pickers must be triggered directly by a user gesture.
+- The file input is always mounted (hidden) and triggered programmatically by the button.
+
+**What We Learned:**
+- If the file picker is triggered from a button inside a menu that is conditionally rendered (e.g., a dropdown that appears on the same click), browsers may block the file picker for security reasons.
+- The file input must be present in the DOM and triggered directly by a user event.
+
+**How to Add a Two-Step Selection (Menu then File Picker):**
+1. The '+' button should first open a menu (e.g., with options like 'Add photos and files', 'Add PDF', etc.).
+2. The menu must already be open before the user clicks the option to open the file picker (i.e., two separate clicks: one to open the menu, one to select the action).
+3. The file input should remain always mounted (hidden) and be triggered by the menu option's click handler.
+4. Avoid opening the menu and triggering the file picker in the same event loop/click handler.
+
+**Example:**
+- Click '+' → menu appears.
+- Click 'Add photos and files' → file picker opens.
+
+This ensures compatibility with browser security requirements and provides a more flexible UX for future enhancements.
+
 ```
 🚀🎉 Exciting News! 🎉🚀
 

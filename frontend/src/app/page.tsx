@@ -13,6 +13,14 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [pdfUploadStatus, setPdfUploadStatus] = useState<string>("");
+  const pdfInputRef = useRef<HTMLInputElement>(null);
+  // State for file upload menu
+  const [fileMenuOpen, setFileMenuOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string>("");
+  // Upload status for feedback
+  const [uploadStatus, setUploadStatus] = useState<string>("");
 
   // Scroll to bottom on new message
   useEffect(() => {
@@ -161,13 +169,130 @@ export default function Home() {
     return text;
   }
 
+  // Handle PDF upload
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPdfUploadStatus("");
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    if (file.type !== "application/pdf") {
+      setPdfUploadStatus("Only PDF files are supported.");
+      return;
+    }
+    setPdfUploadStatus("Uploading and indexing PDF...");
+    try {
+      const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+      const apiUrl = isLocal
+        ? "http://localhost:8000/api/upload-pdf"
+        : "/api/upload-pdf";
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setPdfUploadStatus(data.detail || `Upload failed: ${res.status}`);
+        return;
+      }
+      const data = await res.json();
+      setPdfUploadStatus(`PDF indexed! Chunks: ${data.chunks_indexed}`);
+    } catch (err) {
+      setPdfUploadStatus(`Upload error: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
+  // Handler for file input
+  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setUploadedFileName(file.name);
+      setUploadStatus("Uploading...");
+      setFileMenuOpen(false);
+      try {
+        const isPdf = file.type === "application/pdf";
+        const isImage = [
+          "image/png",
+          "image/jpeg",
+          "image/heif",
+          "image/heic"
+        ].includes(file.type);
+        if (!isPdf && !isImage) {
+          setUploadStatus("Only PNG, JPEG, HEIF, HEIC images or PDF files are supported.");
+          return;
+        }
+        const apiUrl = isPdf
+          ? (typeof window !== "undefined" && window.location.hostname === "localhost"
+            ? "http://localhost:8000/api/upload-pdf"
+            : "/api/upload-pdf")
+          : (typeof window !== "undefined" && window.location.hostname === "localhost"
+            ? "http://localhost:8000/api/upload-file"
+            : "/api/upload-file");
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          body: formData,
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          setUploadStatus(data.detail || `Upload failed: ${res.status}`);
+          return;
+        }
+        const data = await res.json();
+        setUploadStatus(`File uploaded!${isPdf && data.chunks_indexed ? ` Chunks: ${data.chunks_indexed}` : ""}`);
+      } catch (err) {
+        setUploadStatus(`Upload error: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+  };
+
+  // Debug: Log fileInputRef after every render
+  useEffect(() => {
+    console.log('fileInputRef.current after render:', fileInputRef.current);
+  });
+
+  // Handler for clicking outside the menu to close it
+  useEffect(() => {
+    if (!fileMenuOpen) return;
+    function handleClick(e: MouseEvent) {
+      setFileMenuOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [fileMenuOpen]);
+
   return (
     <div className={styles.page}>
       {/* Sidebar for system prompt */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
-          <span className={styles.sidebarText}>🔮</span>
-          <span className={styles.sidebarTitle}>LLM Chat</span>
+          <span className={styles.sidebarText}>🏠</span>
+          <span className={styles.sidebarTitle}>Advocate</span>
+        </div>
+        {/* PDF Upload Option */}
+        <div style={{ width: "100%", margin: "16px 0", display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <label className={styles.label} htmlFor="pdf-upload">Add PDF</label>
+          <input
+            id="pdf-upload"
+            type="file"
+            accept="application/pdf"
+            className={styles.pdfInputHidden}
+            onChange={handlePdfUpload}
+            ref={pdfInputRef}
+          />
+          <button
+            type="button"
+            className={styles.pdfUploadButton}
+            onClick={() => pdfInputRef.current?.click()}
+          >
+            Upload PDF
+          </button>
+          {pdfUploadStatus && (
+            <div style={{ color: pdfUploadStatus.startsWith("PDF indexed") ? "#a7f3d0" : "#f87171", marginTop: 6, fontSize: 14, textAlign: "center" }}>
+              {pdfUploadStatus}
+            </div>
+          )}
         </div>
         <div className={styles.apiKeyContainer}>
           <label className={styles.label}>OpenAI API Key</label>
@@ -230,7 +355,32 @@ export default function Home() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form onSubmit={handleSubmit} className={styles.form} style={{ position: 'relative' }}>
+          {/* + Button triggers file picker directly */}
+          <div className={styles.plusMenuWrapper}>
+            <button
+              type="button"
+              className={styles.plusButton}
+              aria-label="Add options"
+              onClick={e => {
+                e.stopPropagation();
+                if (fileInputRef.current) {
+                  fileInputRef.current.click();
+                }
+              }}
+            >
+              +
+            </button>
+            {/* Hidden file input */}
+            <input
+              id="file-upload-debug"
+              type="file"
+              accept=".png,.jpeg,.jpg,.heif,.heic,application/pdf,image/png,image/jpeg,image/heif,image/heic"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={handleFileInputChange}
+            />
+          </div>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -244,6 +394,13 @@ export default function Home() {
             {loading ? "..." : "Send"}
           </button>
         </form>
+        {/* Show uploaded file name if any */}
+        {(uploadedFileName || uploadStatus) && (
+          <div className={styles.uploadedFileName}>
+            {uploadedFileName && `Selected: ${uploadedFileName}`}<br />
+            {uploadStatus && uploadStatus}
+          </div>
+        )}
       </main>
     </div>
   );
