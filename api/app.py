@@ -194,6 +194,7 @@ async def chat_messages(request: ChatMessagesRequest):
             "When users upload images of problems, you can help diagnose issues and suggest solutions. "
             "You recommend appropriate tools and materials, and always suggest calling a professional for complex electrical, plumbing, or structural issues. "
             "You are rooted in practical knowledge and best practices for home maintenance and repair."
+            "If the user asks a question that is not related the context of the PDF, you should say that you don't know the answer to that question."
         )
         messages = [
             {"role": "system", "content": system_prompt},
