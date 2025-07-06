@@ -178,6 +178,10 @@ export default function Home() {
       setPdfUploadStatus("Only PDF files are supported.");
       return;
     }
+    if (!apiKey.trim()) {
+      setPdfUploadStatus("Please enter your OpenAI API key before uploading a PDF.");
+      return;
+    }
     setPdfUploadStatus("Uploading and indexing PDF...");
     try {
       const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
@@ -186,13 +190,20 @@ export default function Home() {
         : "/api/upload-pdf";
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("api_key", apiKey);
       const res = await fetch(apiUrl, {
         method: "POST",
         body: formData,
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setPdfUploadStatus(data.detail || `Upload failed: ${res.status}`);
+        let detail = data.detail;
+        if (Array.isArray(detail)) {
+          detail = detail.map(d => d.msg || JSON.stringify(d)).join(' | ');
+        } else if (detail && typeof detail === "object") {
+          detail = detail.msg || JSON.stringify(detail, null, 2);
+        }
+        setPdfUploadStatus(detail || `Upload failed: ${res.status}`);
         return;
       }
       const data = await res.json();
@@ -230,13 +241,22 @@ export default function Home() {
             : "/api/upload-file");
         const formData = new FormData();
         formData.append("file", file);
+        if (isPdf) {
+          formData.append("api_key", apiKey);
+        }
         const res = await fetch(apiUrl, {
           method: "POST",
           body: formData,
         });
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          setUploadStatus(data.detail || `Upload failed: ${res.status}`);
+          let detail = data.detail;
+          if (Array.isArray(detail)) {
+            detail = detail.map(d => d.msg || JSON.stringify(d)).join(' | ');
+          } else if (detail && typeof detail === "object") {
+            detail = detail.msg || JSON.stringify(detail, null, 2);
+          }
+          setUploadStatus(detail || `Upload failed: ${res.status}`);
           return;
         }
         const data = await res.json();

@@ -47,10 +47,58 @@ class VectorDatabase:
     def retrieve_from_key(self, key: str) -> np.array:
         return self.vectors.get(key, None)
 
+    def _estimate_tokens(self, text: str) -> int:
+        """Rough estimation of token count (4 characters per token is a common approximation)"""
+        return len(text) // 4
+
+    def _get_batch_size(self, texts: List[str], max_tokens_per_batch: int = 250000) -> int:
+        """Calculate optimal batch size to stay under token limit"""
+        if not texts:
+            return 0
+        
+        # Estimate tokens for first few texts to determine batch size
+        sample_size = min(5, len(texts))
+        total_estimated_tokens = sum(self._estimate_tokens(text) for text in texts[:sample_size])
+        avg_tokens_per_text = total_estimated_tokens / sample_size
+        
+        # Calculate how many texts we can process in one batch
+        batch_size = max(1, int(max_tokens_per_batch / avg_tokens_per_text))
+        
+        # Ensure we don't exceed the actual number of texts
+        return min(batch_size, len(texts))
+
     async def abuild_from_list(self, list_of_text: List[str]) -> "VectorDatabase":
-        embeddings = await self.embedding_model.async_get_embeddings(list_of_text)
-        for text, embedding in zip(list_of_text, embeddings):
-            self.insert(text, np.array(embedding))
+        """Build vector database from list of texts, processing in batches to avoid token limits"""
+        if not list_of_text:
+            return self
+        
+        # Calculate optimal batch size
+        batch_size = self._get_batch_size(list_of_text)
+        
+        # Process texts in batches
+        for i in range(0, len(list_of_text), batch_size):
+            batch = list_of_text[i:i + batch_size]
+            
+            # Estimate tokens for this batch
+            batch_tokens = sum(self._estimate_tokens(text) for text in batch)
+            print(f"Processing batch {i//batch_size + 1}, estimated tokens: {batch_tokens}")
+            
+            try:
+                embeddings = await self.embedding_model.async_get_embeddings(batch)
+                for text, embedding in zip(batch, embeddings):
+                    self.insert(text, np.array(embedding))
+                print(f"Successfully processed batch {i//batch_size + 1} ({len(batch)} chunks)")
+            except Exception as e:
+                print(f"Error processing batch {i//batch_size + 1}: {str(e)}")
+                # If batch fails, try processing one by one
+                for text in batch:
+                    try:
+                        embedding = await self.embedding_model.async_get_embedding(text)
+                        self.insert(text, np.array(embedding))
+                    except Exception as single_error:
+                        print(f"Failed to process text chunk: {str(single_error)}")
+                        continue
+        
         return self
 
 

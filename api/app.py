@@ -1,5 +1,10 @@
 # Import required FastAPI components for building the API
-from fastapi import FastAPI, HTTPException, UploadFile, File
+import sys
+import os
+# Add the parent directory to the Python path to import aimakerspace
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 # Import Pydantic for data validation and settings management
@@ -52,7 +57,7 @@ pdf_vector_db = None
 pdf_chunks = None
 
 @app.post("/api/upload-pdf")
-async def upload_pdf(file: UploadFile = File(...)):
+async def upload_pdf(file: UploadFile = File(...), api_key: str = Form(...)):
     """
     Accepts a PDF file upload, extracts and chunks its text, and builds an in-memory vector index.
     Returns the number of chunks indexed.
@@ -68,12 +73,12 @@ async def upload_pdf(file: UploadFile = File(...)):
         # Extract text from PDF
         loader = PDFLoader(tmp_path)
         texts = loader.load_documents()  # List of extracted text (usually one item)
-        # Chunk the text
-        splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        # Chunk the text with smaller chunks to avoid token limits
+        splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=100)
         chunks = splitter.split_texts(texts)
         pdf_chunks = chunks  # Store for later retrieval
-        # Build vector database asynchronously
-        embedding_model = EmbeddingModel()
+        # Build vector database asynchronously, using the provided api_key
+        embedding_model = EmbeddingModel(api_key=api_key)
         vector_db = VectorDatabase(embedding_model)
         await vector_db.abuild_from_list(chunks)
         pdf_vector_db = vector_db
